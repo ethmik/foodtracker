@@ -59,11 +59,13 @@ function calcTotals(state){
   return sums;
 }
 function fmt(n){return Math.round(Number(n)||0);}
-function badge(val,goal){
+function badge(val, goal){
+  if(!goal){ return ''; }
   const diff = goal - val;
-  const cls = diff < 0 ? 'danger' : diff <= (goal*0.05) ? 'warn' : 'ok';
-  const label = diff < 0 ? `${fmt(-diff)} over` : `${fmt(diff)} left`;
-  return `<span class="pill ${cls}">${label}</span>`;
+  const tolerance = goal ? goal * 0.05 : 0;
+  const toneClass = diff < 0 ? 'text-rose-400' : diff <= tolerance ? 'text-amber-400' : 'text-emerald-400';
+  const label = diff < 0 ? `${fmt(Math.abs(diff))} over` : `${fmt(diff)} left`;
+  return `<span class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-200 ${toneClass}">${label}</span>`;
 }
 function loadState(){ try{ return JSON.parse(localStorage.getItem(KEY_STATE)) || {}; }catch{ return {}; } }
 function saveState(s){ localStorage.setItem(KEY_STATE, JSON.stringify(s)); }
@@ -72,37 +74,69 @@ function renderMeals(){
   const wrap = $('#meals'); wrap.innerHTML = '';
   const state = loadState(); const FOODS = allFoods();
   for(const meal of MEALS){
-    const card = document.createElement('div'); card.className = 'card meal-card';
+    const card = document.createElement('section');
+    card.className = 'meal-card space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg';
     card.innerHTML = `
-      <div class="row" style="align-items:center">
-        <h2 style="margin:0;font-size:1.05rem">${meal}</h2>
-        <span class="hint" style="margin-left:auto">Add items below</span>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-100">${meal}</h2>
+          <p class="text-xs text-slate-400">Add foods and tweak quantities below.</p>
+        </div>
       </div>
-      <div class="items" data-meal="${meal}"></div>
-      <div class="row">
-        <select class="foodSel">
+      <div class="items flex flex-col gap-3" data-meal="${meal}"></div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <select class="foodSel w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
           <option value="" disabled selected>Select food…</option>
           ${FOODS.map((f,i)=>`<option value="${i}">${f.cat} — ${f.name}</option>`).join('')}
         </select>
-        <input type="number" class="qtySel" min="0.25" step="0.25" value="1" />
-        <button class="primary addBtn">Add</button>
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold uppercase tracking-wide text-slate-400">Qty</label>
+          <input type="number" class="qtySel w-20 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" min="0.25" step="0.25" value="1" />
+        </div>
+        <button class="addBtn inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors">Add</button>
       </div>`;
     wrap.appendChild(card);
-    const items = state[meal]||[]; for(const it of items){ addItemRow(card, meal, it.idx, it.qty); }
+    const items = state[meal] || [];
+    for(const it of items){ addItemRow(card, meal, it.idx, it.qty); }
+    const foodSel = $('.foodSel',card);
+    const qtySel = $('.qtySel',card);
     $('.addBtn',card).addEventListener('click',()=>{
-      const idx = Number($('.foodSel',card).value); const qty = Number($('.qtySel',card).value||1);
-      if(Number.isFinite(idx)){ addItemRow(card, meal, idx, qty); persist(); updateTotals(); }
+      if(foodSel.value === ''){ alert('Select a food to add.'); return; }
+      const idx = Number(foodSel.value);
+      const qty = Number(qtySel.value||1);
+      if(Number.isFinite(idx)){
+        addItemRow(card, meal, idx, qty);
+        persist();
+        updateTotals();
+        foodSel.value = '';
+        foodSel.selectedIndex = 0;
+        qtySel.value = '1';
+      }
     });
   }
 }
 function addItemRow(card, meal, idx, qty){
   const itemsBox = $('.items', card);
-  const row = document.createElement('div'); row.className = 'item';
+  const row = document.createElement('div');
+  row.className = 'item flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner sm:flex-row sm:items-center sm:justify-between';
   const FOODS = allFoods(); const food = FOODS[idx];
-  row.innerHTML = `<div class="hint">${food.name}</div><input class="qty" type="number" min="0.25" step="0.25" value="${qty}" /><button class="remove">✕</button>`;
+  row.innerHTML = `
+    <div class="flex-1 space-y-1">
+      <p class="text-sm font-semibold text-slate-100">${food.name}</p>
+      <p class="text-xs text-slate-500">${food.kcal} kcal • ${food.p}P / ${food.c}C / ${food.f}F</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-semibold uppercase tracking-wide text-slate-400">Qty</label>
+      <input class="qty w-20 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" type="number" min="0.25" step="0.25" value="${qty}" />
+    </div>
+    <button class="remove inline-flex items-center justify-center rounded-xl border border-rose-500 px-3 py-2 text-sm font-semibold text-rose-200 transition-colors" aria-label="Remove ${food.name}">Remove</button>`;
   itemsBox.appendChild(row);
   $('.qty',row).addEventListener('input',()=>{ persist(); updateTotals(); });
-  $('.remove',row).addEventListener('click',()=>{ row.remove(); persist(); updateTotals(); });
+  $('.remove',row).addEventListener('click',()=>{
+    row.remove();
+    persist();
+    updateTotals();
+  });
   row.dataset.idx = String(idx);
 }
 function persist(){
@@ -113,32 +147,69 @@ function persist(){
 }
 function updateTotals(){
   const state = loadState(); const sums = calcTotals(state);
-  const goals = { kcal: Number($('#goalCal').value||0), p: Number($('#goalPro').value||0), c: Number($('#goalCarb').value||0), f: Number($('#goalFat').value||0) };
+  const goals = {
+    kcal: Number($('#goalCal').value||0),
+    p: Number($('#goalPro').value||0),
+    c: Number($('#goalCarb').value||0),
+    f: Number($('#goalFat').value||0)
+  };
   $('#totals').innerHTML = `
-    <div class="stat"><label>Calories</label><b>${fmt(sums.kcal)}</b>${badge(sums.kcal,goals.kcal)}</div>
-    <div class="stat"><label>Protein (g)</label><b>${fmt(sums.p)}</b>${badge(sums.p,goals.p)}</div>
-    <div class="stat"><label>Carbs (g)</label><b>${fmt(sums.c)}</b>${badge(sums.c,goals.c)}</div>
-    <div class="stat"><label>Fat (g)</label><b>${fmt(sums.f)}</b>${badge(sums.f,goals.f)}</div>`;
+    <div class="space-y-2 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Calories</p>
+      <p class="text-2xl font-semibold text-slate-100">${fmt(sums.kcal)}</p>
+      ${badge(sums.kcal, goals.kcal)}
+    </div>
+    <div class="space-y-2 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Protein (g)</p>
+      <p class="text-2xl font-semibold text-slate-100">${fmt(sums.p)}</p>
+      ${badge(sums.p, goals.p)}
+    </div>
+    <div class="space-y-2 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Carbs (g)</p>
+      <p class="text-2xl font-semibold text-slate-100">${fmt(sums.c)}</p>
+      ${badge(sums.c, goals.c)}
+    </div>
+    <div class="space-y-2 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Fat (g)</p>
+      <p class="text-2xl font-semibold text-slate-100">${fmt(sums.f)}</p>
+      ${badge(sums.f, goals.f)}
+    </div>`;
   const advise = [];
-  if(sums.p < goals.p) advise.push(`Protein looks a bit low (−${fmt(goals.p - sums.p)}g). Consider adding chicken, egg whites or yogurt.`);
-  if(sums.kcal > goals.kcal) advise.push(`Calories are over by ${fmt(sums.kcal - goals.kcal)} kcal. Maybe remove an oil/nut serving or reduce carbs.`);
-  $('#advice').textContent = advise.join(' ');
+  if(sums.p < goals.p){
+    advise.push(`Protein looks a bit low (−${fmt(goals.p - sums.p)}g). Consider chicken, egg whites, or yogurt.`);
+  }
+  if(goals.kcal && sums.kcal > goals.kcal){
+    advise.push(`Calories are over by ${fmt(sums.kcal - goals.kcal)} kcal. Trim oils, nuts, or carb portions.`);
+  }
+  $('#advice').textContent = advise.length ? advise.join(' ') : 'Looking good—targets on track.';
 }
 
 function renderFoodTable(){
   const body = $('#foodTable tbody'); body.innerHTML = '';
   for(const f of allFoods()){
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${f.cat}</td><td>${f.name}</td><td class="right">${f.kcal}</td><td class="right">${f.p}</td><td class="right">${f.c}</td><td class="right">${f.f}</td>`;
-    const td = document.createElement('td');
+    tr.className = 'border-b border-slate-800';
+    tr.innerHTML = `
+      <td class="px-4 py-3">${f.cat}</td>
+      <td class="px-4 py-3 text-slate-100">${f.name}</td>
+      <td class="px-4 py-3 text-right text-slate-300">${f.kcal}</td>
+      <td class="px-4 py-3 text-right text-slate-300">${f.p}</td>
+      <td class="px-4 py-3 text-right text-slate-300">${f.c}</td>
+      <td class="px-4 py-3 text-right text-slate-300">${f.f}</td>`;
+    const td = document.createElement('td'); td.className = 'px-4 py-3 text-right';
     if(String(f._id||'').startsWith('custom_')){
-      const btn = document.createElement('button'); btn.className = 'xbtn remove'; btn.textContent = 'Remove';
+      const btn = document.createElement('button');
+      btn.className = 'xbtn inline-flex items-center justify-center rounded-xl border border-rose-500 px-3 py-2 text-xs font-semibold text-rose-200 transition-colors';
+      btn.textContent = 'Remove';
       btn.addEventListener('click', ()=>{
-        const list = getCustomFoods().filter(x=>x._id!==f._id); setCustomFoods(list); renderMeals(); renderFoodTable(); updateTotals();
+        const list = getCustomFoods().filter(x=>x._id!==f._id);
+        setCustomFoods(list);
+        renderMeals(); renderFoodTable(); updateTotals();
       });
       td.appendChild(btn);
     }
-    tr.appendChild(td); body.appendChild(tr);
+    tr.appendChild(td);
+    body.appendChild(tr);
   }
 }
 
