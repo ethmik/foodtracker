@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Meal & Macro Planner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Daily Meal & Macro Planner</h1>
+      <div class="tools">
+        <button id="resetDay" class="remove">Reset day</button>
+        <button id="shareBtn">Share/Save day (download)</button>
+        <button id="exportCustoms">Export custom foods</button>
+        <label class="hint" style="display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px dashed var(--border);border-radius:12px">
+          <input type="file" id="importFile" accept="application/json" />
+          <span>Import custom foods</span>
+          <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">
+            <input id="appendToggle" type="checkbox" checked />
+            <span class="tiny">Append (don’t overwrite)</span>
+          </span>
+        </label>
+      </div>
+    </header>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="goal-inputs">
+        <div><label>Calorie goal (kcal)</label><input type="number" id="goalCal" value="2100" min="0" /></div>
+        <div><label>Protein goal (g)</label><input type="number" id="goalPro" value="180" min="0" /></div>
+        <div><label>Carbs goal (g)</label><input type="number" id="goalCarb" value="180" min="0" /></div>
+        <div><label>Fat goal (g)</label><input type="number" id="goalFat" value="60" min="0" /></div>
+      </div>
+      <div class="hint tiny" style="margin-top:6px">Targets are editable. Defaults match your cut: 2,100 kcal • 180P • 180C • 60F.</div>
+    </div>
+
+    <div class="grid" id="meals"></div>
+
+    <div class="card" style="margin-top:12px">
+      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Daily totals</h2>
+      <div class="stats" id="totals"></div>
+      <div class="hint tiny" id="advice" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Add custom food</h2>
+      <div class="row">
+        <select id="customCat">
+          <option value="Protein">Protein</option>
+          <option value="Carbohydrate">Carbohydrate</option>
+          <option value="Fat">Fat</option>
+          <option value="Vegetables">Vegetables</option>
+        </select>
+        <input id="customName" placeholder="Name (e.g., Costco chicken skewer)" />
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input type="number" id="customKcal" placeholder="kcal" min="0" step="1" />
+        <input type="number" id="customP" placeholder="Protein (g)" min="0" step="0.1" />
+        <input type="number" id="customC" placeholder="Carbs (g)" min="0" step="0.1" />
+        <input type="number" id="customF" placeholder="Fat (g)" min="0" step="0.1" />
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" id="addCustom">Add to list</button>
+        <button class="remove" id="clearCustoms">Clear custom foods</button>
+      </div>
+      <div class="hint tiny" style="margin-top:6px">Custom foods appear in the meal selectors & table below. They are saved in your browser.</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <details open>
+        <summary class="hint">Food list & macros (per serving)</summary>
+        <table class="tbl" id="foodTable">
+          <thead>
+            <tr><th>Category</th><th>Food option (serving)</th><th class="right">kcal</th><th class="right">P</th><th class="right">C</th><th class="right">F</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </details>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
