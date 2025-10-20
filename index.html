@@ -14,20 +14,45 @@
         <h1 class="text-3xl font-semibold leading-tight tracking-tight text-slate-100">Daily Meal & Macro Planner</h1>
         <p class="text-sm text-slate-400">Plan your day, keep an eye on macros, and build your own food list.</p>
       </div>
-      <div class="flex flex-col gap-3 md:flex-row md:flex-wrap">
-        <button id="resetDay" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-500 px-4 py-2 text-sm font-semibold text-rose-200 transition-colors md:w-auto">Reset day</button>
-        <button id="shareBtn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-500 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors md:w-auto">Share/Save day (download)</button>
-        <button id="exportCustoms" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sky-500 bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors md:w-auto">Export custom foods</button>
-        <div class="flex w-full flex-col gap-3 rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-4 text-sm text-slate-300 md:flex-row md:items-center md:gap-4">
-          <label class="flex-1 space-y-2">
-            <span class="text-sm font-medium text-slate-200">Import custom foods</span>
-            <input type="file" id="importFile" accept="application/json" class="file-input" />
-          </label>
-          <label class="ml-auto inline-flex items-center gap-2 text-xs text-slate-400">
-            <input id="appendToggle" type="checkbox" checked />
-            <span>Append (don’t overwrite)</span>
-          </label>
-        </div>
+      <div class="grid gap-3 md:grid-cols-2">
+        <section class="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Planner date</p>
+            <span id="dateLabel" class="text-xs text-slate-500"></span>
+          </div>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button id="prevDay" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition-colors">Previous</button>
+            <input type="date" id="datePicker" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <button id="nextDay" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition-colors">Next</button>
+          </div>
+          <button id="resetDay" class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500 px-4 py-2 text-sm font-semibold text-rose-200 transition-colors">Clear this day</button>
+        </section>
+        <section class="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-inner">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Backup & sync</p>
+          <button id="exportPlanner" class="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-500 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors">Export planner (days + custom)</button>
+          <div class="space-y-2 text-sm text-slate-300">
+            <label class="text-sm font-medium text-slate-200" for="plannerFile">Import planner file</label>
+            <input type="file" id="plannerFile" accept="application/json" class="file-input" />
+            <label class="inline-flex items-center gap-2 text-xs text-slate-400">
+              <input id="plannerMergeToggle" type="checkbox" checked />
+              <span>Merge with existing data</span>
+            </label>
+          </div>
+          <div class="space-y-3 border-t border-slate-800 pt-3 text-sm text-slate-300">
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">Custom foods</span>
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-3">
+              <button id="exportCustoms" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sky-500 bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors md:w-auto">Export custom foods</button>
+              <div class="flex w-full flex-col gap-2 rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-3 text-slate-300 md:flex-1">
+                <span class="text-sm font-medium text-slate-200">Import custom foods</span>
+                <input type="file" id="importFile" accept="application/json" class="file-input" />
+                <label class="ml-auto inline-flex items-center gap-2 text-xs text-slate-400">
+                  <input id="appendToggle" type="checkbox" checked />
+                  <span>Append (don’t overwrite)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </header>
 
