@@ -6,79 +6,131 @@
   <title>Daily Meal & Macro Planner</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Daily Meal & Macro Planner</h1>
-      <div class="tools">
-        <button id="resetDay" class="remove">Reset day</button>
-        <button id="shareBtn">Share/Save day (download)</button>
-        <button id="exportCustoms">Export custom foods</button>
-        <label class="hint" style="display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px dashed var(--border);border-radius:12px">
-          <input type="file" id="importFile" accept="application/json" />
-          <span>Import custom foods</span>
-          <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">
+<body class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
+  <main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-4 py-8 md:py-12">
+    <header class="space-y-6 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+      <div class="space-y-2">
+        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-300">FoodTracker</p>
+        <h1 class="text-3xl font-semibold leading-tight tracking-tight text-slate-100">Daily Meal & Macro Planner</h1>
+        <p class="text-sm text-slate-400">Plan your day, keep an eye on macros, and build your own food list.</p>
+      </div>
+      <div class="flex flex-col gap-3 md:flex-row md:flex-wrap">
+        <button id="resetDay" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-500 px-4 py-2 text-sm font-semibold text-rose-200 transition-colors md:w-auto">Reset day</button>
+        <button id="shareBtn" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-500 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors md:w-auto">Share/Save day (download)</button>
+        <button id="exportCustoms" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sky-500 bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors md:w-auto">Export custom foods</button>
+        <div class="flex w-full flex-col gap-3 rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-4 text-sm text-slate-300 md:flex-row md:items-center md:gap-4">
+          <label class="flex-1 space-y-2">
+            <span class="text-sm font-medium text-slate-200">Import custom foods</span>
+            <input type="file" id="importFile" accept="application/json" class="file-input" />
+          </label>
+          <label class="ml-auto inline-flex items-center gap-2 text-xs text-slate-400">
             <input id="appendToggle" type="checkbox" checked />
-            <span class="tiny">Append (don’t overwrite)</span>
-          </span>
-        </label>
+            <span>Append (don’t overwrite)</span>
+          </label>
+        </div>
       </div>
     </header>
 
-    <div class="card" style="margin-bottom:12px">
-      <div class="goal-inputs">
-        <div><label>Calorie goal (kcal)</label><input type="number" id="goalCal" value="2100" min="0" /></div>
-        <div><label>Protein goal (g)</label><input type="number" id="goalPro" value="180" min="0" /></div>
-        <div><label>Carbs goal (g)</label><input type="number" id="goalCarb" value="180" min="0" /></div>
-        <div><label>Fat goal (g)</label><input type="number" id="goalFat" value="60" min="0" /></div>
+    <section class="space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+      <header class="space-y-1">
+        <h2 class="text-lg font-semibold text-slate-100">Targets</h2>
+        <p class="text-sm text-slate-400">Adjust your daily macro goals to match your plan.</p>
+      </header>
+      <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Calorie goal (kcal)</span>
+          <input type="number" id="goalCal" value="2100" min="0" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Protein goal (g)</span>
+          <input type="number" id="goalPro" value="180" min="0" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Carbs goal (g)</span>
+          <input type="number" id="goalCarb" value="180" min="0" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Fat goal (g)</span>
+          <input type="number" id="goalFat" value="60" min="0" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
       </div>
-      <div class="hint tiny" style="margin-top:6px">Targets are editable. Defaults match your cut: 2,100 kcal • 180P • 180C • 60F.</div>
-    </div>
+      <p class="text-xs text-slate-400">Targets are editable. Defaults match your cut: 2,100 kcal • 180P • 180C • 60F.</p>
+    </section>
 
-    <div class="grid" id="meals"></div>
+    <section id="meals" class="grid gap-4 md:grid-cols-2"></section>
 
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Daily totals</h2>
-      <div class="stats" id="totals"></div>
-      <div class="hint tiny" id="advice" style="margin-top:6px"></div>
-    </div>
+    <section class="space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+      <h2 class="text-lg font-semibold text-slate-100">Daily totals</h2>
+      <div id="totals" class="grid gap-3 sm:grid-cols-2 md:grid-cols-4"></div>
+      <p id="advice" class="text-sm text-slate-400"></p>
+    </section>
 
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Add custom food</h2>
-      <div class="row">
-        <select id="customCat">
-          <option value="Protein">Protein</option>
-          <option value="Carbohydrate">Carbohydrate</option>
-          <option value="Fat">Fat</option>
-          <option value="Vegetables">Vegetables</option>
-        </select>
-        <input id="customName" placeholder="Name (e.g., Costco chicken skewer)" />
+    <section class="space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+      <div class="space-y-2">
+        <h2 class="text-lg font-semibold text-slate-100">Add custom food</h2>
+        <p class="text-sm text-slate-400">Custom foods appear in selectors and stay saved in your browser.</p>
       </div>
-      <div class="row" style="margin-top:8px">
-        <input type="number" id="customKcal" placeholder="kcal" min="0" step="1" />
-        <input type="number" id="customP" placeholder="Protein (g)" min="0" step="0.1" />
-        <input type="number" id="customC" placeholder="Carbs (g)" min="0" step="0.1" />
-        <input type="number" id="customF" placeholder="Fat (g)" min="0" step="0.1" />
+      <div class="grid gap-3 md:grid-cols-2">
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Category</span>
+          <select id="customCat" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="Protein">Protein</option>
+            <option value="Carbohydrate">Carbohydrate</option>
+            <option value="Fat">Fat</option>
+            <option value="Vegetables">Vegetables</option>
+          </select>
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Name</span>
+          <input id="customName" placeholder="Name (e.g., Costco chicken skewer)" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
       </div>
-      <div class="row" style="margin-top:8px">
-        <button class="primary" id="addCustom">Add to list</button>
-        <button class="remove" id="clearCustoms">Clear custom foods</button>
+      <div class="grid gap-3 md:grid-cols-4">
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>kcal</span>
+          <input type="number" id="customKcal" placeholder="kcal" min="0" step="1" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Protein (g)</span>
+          <input type="number" id="customP" placeholder="Protein" min="0" step="0.1" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Carbs (g)</span>
+          <input type="number" id="customC" placeholder="Carbs" min="0" step="0.1" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
+        <label class="space-y-2 text-sm text-slate-300">
+          <span>Fat (g)</span>
+          <input type="number" id="customF" placeholder="Fat" min="0" step="0.1" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </label>
       </div>
-      <div class="hint tiny" style="margin-top:6px">Custom foods appear in the meal selectors & table below. They are saved in your browser.</div>
-    </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <button class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition-colors" id="addCustom">Add to list</button>
+        <button class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500 px-4 py-3 text-sm font-semibold text-rose-200 transition-colors" id="clearCustoms">Clear custom foods</button>
+      </div>
+    </section>
 
-    <div class="card" style="margin-top:12px">
-      <details open>
-        <summary class="hint">Food list & macros (per serving)</summary>
-        <table class="tbl" id="foodTable">
-          <thead>
-            <tr><th>Category</th><th>Food option (serving)</th><th class="right">kcal</th><th class="right">P</th><th class="right">C</th><th class="right">F</th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <section class="space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-lg">
+      <details open class="rounded-2xl border border-slate-800">
+        <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-slate-300">Food list & macros (per serving)</summary>
+        <div class="overflow-x-auto">
+          <table class="table-auto text-sm text-slate-300" id="foodTable">
+            <thead class="text-xs uppercase tracking-wide text-slate-400">
+              <tr class="border-b border-slate-800 text-left">
+                <th class="px-4 py-3">Category</th>
+                <th class="px-4 py-3">Food option (serving)</th>
+                <th class="px-4 py-3 text-right">kcal</th>
+                <th class="px-4 py-3 text-right">P</th>
+                <th class="px-4 py-3 text-right">C</th>
+                <th class="px-4 py-3 text-right">F</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </details>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script src="app.js" defer></script>
 </body>
