@@ -1,124 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daily Meal & Macro Planner</title>
-  <style>
-    :root{--bg:#0b0f14;--card:#121821;--muted:#95a3b3;--text:#e8f0f7;--accent:#3abff8;--good:#22c55e;--warn:#f59e0b;--bad:#ef4444;--border:#223044}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .container{max-width:980px;margin:auto;padding:16px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
-    h1{font-size:1.2rem;margin:0}
-    .grid{display:grid;gap:12px}
-    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    label{font-size:.9rem;color:var(--muted)}
-    input,select,button{width:100%;font:inherit;border-radius:12px;border:1px solid var(--border);background:#0e141c;color:var(--text);padding:10px}
-    button{cursor:pointer;background:linear-gradient(180deg,#1b2633,#121821);border:1px solid #2a3a4f}
-    button.primary{background:linear-gradient(180deg,#0ea5e9,#0284c7);border:0;color:white}
-    .row{display:flex;gap:8px}
-    .row > *{flex:1}
-    .meal-card{display:grid;gap:10px}
-    .items{display:flex;flex-direction:column;gap:8px}
-    .item{display:grid;grid-template-columns:1fr 90px 40px;gap:8px;align-items:center}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#0e141c;border:1px solid var(--border);font-size:.85rem;color:var(--muted)}
-    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-    @media(min-width:720px){.stats{grid-template-columns:repeat(4,1fr)}}
-    .stat{padding:10px;border:1px solid var(--border);border-radius:12px;background:#0e141c}
-    .stat b{display:block;font-size:1.1rem;color:var(--text)}
-    .hint{color:var(--muted);font-size:.85rem}
-    .danger{color:var(--bad)}
-    .ok{color:var(--good)}
-    .warn{color:var(--warn)}
-    .remove{background:#1f2937;border:1px solid #334155}
-    .tiny{font-size:.8rem;opacity:.9}
-    .goal-inputs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-    @media(min-width:720px){.goal-inputs{grid-template-columns:repeat(4,1fr)}}
-    .tbl{width:100%;border-collapse:collapse}
-    .tbl th,.tbl td{border-bottom:1px solid var(--border);padding:8px;text-align:left}
-    .right{text-align:right}
-    .xbtn{border-radius:8px;padding:6px 8px}
-    .tools{display:flex;gap:8px;flex-wrap:wrap}
-    .tools > *{flex:1 1 220px}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Daily Meal & Macro Planner</h1>
-      <div class="tools">
-        <button id="resetDay" class="remove">Reset day</button>
-        <button id="shareBtn">Share/Save day (download)</button>
-        <button id="exportCustoms">Export custom foods</button>
-        <label class="hint" style="display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px dashed var(--border);border-radius:12px">
-          <input type="file" id="importFile" accept="application/json" />
-          <span>Import custom foods</span>
-          <span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">
-            <input id="appendToggle" type="checkbox" checked />
-            <span class="tiny">Append (don’t overwrite)</span>
-          </span>
-        </label>
-      </div>
-    </header>
-
-    <div class="card" style="margin-bottom:12px">
-      <div class="goal-inputs">
-        <div><label>Calorie goal (kcal)</label><input type="number" id="goalCal" value="2100" min="0" /></div>
-        <div><label>Protein goal (g)</label><input type="number" id="goalPro" value="180" min="0" /></div>
-        <div><label>Carbs goal (g)</label><input type="number" id="goalCarb" value="180" min="0" /></div>
-        <div><label>Fat goal (g)</label><input type="number" id="goalFat" value="60" min="0" /></div>
-      </div>
-      <div class="hint tiny" style="margin-top:6px">Targets are editable. Defaults match your cut: 2,100 kcal • 180P • 180C • 60F.</div>
-    </div>
-
-    <div class="grid" id="meals"></div>
-
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Daily totals</h2>
-      <div class="stats" id="totals"></div>
-      <div class="hint tiny" id="advice" style="margin-top:6px"></div>
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <h2 style="margin:6px 0 12px 0;font-size:1.05rem">Add custom food</h2>
-      <div class="row">
-        <select id="customCat">
-          <option value="Protein">Protein</option>
-          <option value="Carbohydrate">Carbohydrate</option>
-          <option value="Fat">Fat</option>
-          <option value="Vegetables">Vegetables</option>
-        </select>
-        <input id="customName" placeholder="Name (e.g., Costco chicken skewer)" />
-      </div>
-      <div class="row" style="margin-top:8px">
-        <input type="number" id="customKcal" placeholder="kcal" min="0" step="1" />
-        <input type="number" id="customP" placeholder="Protein (g)" min="0" step="0.1" />
-        <input type="number" id="customC" placeholder="Carbs (g)" min="0" step="0.1" />
-        <input type="number" id="customF" placeholder="Fat (g)" min="0" step="0.1" />
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button class="primary" id="addCustom">Add to list</button>
-        <button class="remove" id="clearCustoms">Clear custom foods</button>
-      </div>
-      <div class="hint tiny" style="margin-top:6px">Custom foods appear in the meal selectors & table below. They are saved in your browser.</div>
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <details open>
-        <summary class="hint">Food list & macros (per serving)</summary>
-        <table class="tbl" id="foodTable">
-          <thead>
-            <tr><th>Category</th><th>Food option (serving)</th><th class="right">kcal</th><th class="right">P</th><th class="right">C</th><th class="right">F</th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </details>
-    </div>
-  </div>
-
-<script>
 const BASE_FOODS = [
   {cat:'Protein', name:'Chicken breast (6 oz)', kcal:280, p:40, c:0, f:4},
   {cat:'Protein', name:'Lean ground turkey (5 oz)', kcal:250, p:35, c:0, f:8},
@@ -179,7 +58,7 @@ function calcTotals(state){
   }
   return sums;
 }
-function fmt(n){return Math.round(Number(n)||0)}
+function fmt(n){return Math.round(Number(n)||0);}
 function badge(val,goal){
   const diff = goal - val;
   const cls = diff < 0 ? 'danger' : diff <= (goal*0.05) ? 'warn' : 'ok';
@@ -258,7 +137,8 @@ function renderFoodTable(){
         const list = getCustomFoods().filter(x=>x._id!==f._id); setCustomFoods(list); renderMeals(); renderFoodTable(); updateTotals();
       });
       td.appendChild(btn);
-    } tr.appendChild(td); body.appendChild(tr);
+    }
+    tr.appendChild(td); body.appendChild(tr);
   }
 }
 
@@ -321,25 +201,4 @@ for(const id of ['goalCal','goalPro','goalCarb','goalFat']){
   document.addEventListener('input', e=>{ if(e.target && e.target.id===id){ updateTotals(); }});
 }
 
-function renderFoodTable(){ // ensure latest handlers
-  const body = document.querySelector('#foodTable tbody'); body.innerHTML = '';
-  const foods = allFoods();
-  for(const f of foods){
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${f.cat}</td><td>${f.name}</td><td class="right">${f.kcal}</td><td class="right">${f.p}</td><td class="right">${f.c}</td><td class="right">${f.f}</td>`;
-    const td = document.createElement('td');
-    if(String(f._id||'').startsWith('custom_')){
-      const btn = document.createElement('button'); btn.className = 'xbtn remove'; btn.textContent = 'Remove';
-      btn.addEventListener('click', ()=>{
-        const list = getCustomFoods().filter(x=>x._id!==f._id); setCustomFoods(list); renderMeals(); renderFoodTable(); updateTotals();
-      });
-      td.appendChild(btn);
-    }
-    tr.appendChild(td); body.appendChild(tr);
-  }
-}
-
 renderMeals(); renderFoodTable(); updateTotals();
-</script>
-</body>
-</html>
