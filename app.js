@@ -225,12 +225,12 @@ function calcTotals(mealsByMeal){
       const food = foods[item.idx];
       const qty = Number(item.qty)||0;
       if(!food || !Number.isFinite(qty)) continue;
-      sums.kcal += food.kcal*qty;
-      sums.p += food.p*qty;
-      sums.c += food.c*qty;
-      sums.f += food.f*qty;
+      sums.p += (Number(food.p)||0)*qty;
+      sums.c += (Number(food.c)||0)*qty;
+      sums.f += (Number(food.f)||0)*qty;
     }
   }
+  sums.kcal = (sums.p*4) + (sums.c*4) + (sums.f*9);
   return sums;
 }
 function fmt(n){return Math.round(Number(n)||0);}
